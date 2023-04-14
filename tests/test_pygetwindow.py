@@ -17,7 +17,9 @@ try:
 
     rootWindowPosition = '+300+200'
     if tk.TkVersion < 8.0:
-        raise RuntimeError('You are running Tk version: ' + str(tk.TkVersion) + 'You must be using Tk version 8.0 or greater to run this test.')
+        raise RuntimeError(
+            f'You are running Tk version: {str(tk.TkVersion)}You must be using Tk version 8.0 or greater to run this test.'
+        )
 except ImportError:
     raise RuntimeError('Could not import tkinter, which is required for these tests.')
 

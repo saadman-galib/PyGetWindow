@@ -96,17 +96,15 @@ def _raiseWithLastError():
     """A helper function that raises PyGetWindowException using the error
     information from GetLastError() and FormatMessage()."""
     errorCode = ctypes.windll.kernel32.GetLastError()
-    raise PyGetWindowException('Error code from Windows: %s - %s' % (errorCode, _formatMessage(errorCode)))
+    raise PyGetWindowException(
+        f'Error code from Windows: {errorCode} - {_formatMessage(errorCode)}'
+    )
 
 
 def getActiveWindow():
     """Returns a Window object of the currently active (focused) Window."""
     hWnd = ctypes.windll.user32.GetForegroundWindow()
-    if hWnd == 0:
-        # TODO - raise error instead
-        return None # Note that this function doesn't use GetLastError().
-    else:
-        return Win32Window(hWnd)
+    return None if hWnd == 0 else Win32Window(hWnd)
 
 
 def getActiveWindowTitle():
@@ -137,21 +135,23 @@ def getWindowsAt(x, y):
 
     * ``x`` (int, optional): The x position of the window(s).
     * ``y`` (int, optional): The y position of the window(s)."""
-    windowsAtXY = []
-    for window in getAllWindows():
-        if pointInRect(x, y, window.left, window.top, window.width, window.height):
-            windowsAtXY.append(window)
-    return windowsAtXY
+    return [
+        window
+        for window in getAllWindows()
+        if pointInRect(
+            x, y, window.left, window.top, window.width, window.height
+        )
+    ]
 
 
 def getWindowsWithTitle(title):
     """Returns a list of Window objects that substring match ``title`` in their title text."""
     hWndsAndTitles = _getAllTitles()
-    windowObjs = []
-    for hWnd, winTitle in hWndsAndTitles:
-        if title.upper() in winTitle.upper(): # do a case-insensitive match
-            windowObjs.append(Win32Window(hWnd))
-    return windowObjs
+    return [
+        Win32Window(hWnd)
+        for hWnd, winTitle in hWndsAndTitles
+        if title.upper() in winTitle.upper()
+    ]
 
 
 def getAllTitles():
@@ -200,7 +200,7 @@ class Win32Window(BaseWindow):
 
 
     def __repr__(self):
-        return '%s(hWnd=%s)' % (self.__class__.__name__, self._hWnd)
+        return f'{self.__class__.__name__}(hWnd={self._hWnd})'
 
 
     def __eq__(self, other):
