@@ -8,7 +8,10 @@ def getAllTitles():
 
     # Source: https://stackoverflow.com/questions/53237278/obtain-list-of-all-window-titles-on-macos-from-a-python-script/53985082#53985082
     windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListExcludeDesktopElements | Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
-    return ['%s %s' % (win[Quartz.kCGWindowOwnerName], win.get(Quartz.kCGWindowName, '')) for win in windows]
+    return [
+        f"{win[Quartz.kCGWindowOwnerName]} {win.get(Quartz.kCGWindowName, '')}"
+        for win in windows
+    ]
 
 
 def getActiveWindow():
@@ -18,7 +21,7 @@ def getActiveWindow():
     windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListExcludeDesktopElements | Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
     for win in windows:
         if win['kCGWindowLayer'] == 0:
-            return '%s %s' % (win[Quartz.kCGWindowOwnerName], win.get(Quartz.kCGWindowName, '')) # Temporary. For now, we'll just return the title of the active window.
+            return f"{win[Quartz.kCGWindowOwnerName]} {win.get(Quartz.kCGWindowName, '')}"
     raise Exception('Could not find an active window.') # Temporary hack.
 
 
@@ -28,7 +31,9 @@ def getWindowsAt(x, y):
     for win in windows:
         w = win['kCGWindowBounds']
         if pygetwindow.pointInRect(x, y, w['X'], w['Y'], w['Width'], w['Height']):
-            matches.append('%s %s' % (win[Quartz.kCGWindowOwnerName], win.get(Quartz.kCGWindowName, '')))
+            matches.append(
+                f"{win[Quartz.kCGWindowOwnerName]} {win.get(Quartz.kCGWindowName, '')}"
+            )
     return matches
 
 
@@ -45,7 +50,10 @@ def getWindowGeometry(title):
     # TEMP - this is not a real api, I'm just using this name to stoe these notes for now.
     windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListExcludeDesktopElements | Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
     for win in windows:
-        if title in '%s %s' % (win[Quartz.kCGWindowOwnerName], win.get(Quartz.kCGWindowName, '')):
+        if (
+            title
+            in f"{win[Quartz.kCGWindowOwnerName]} {win.get(Quartz.kCGWindowName, '')}"
+        ):
             w = win['kCGWindowBounds']
             return (w['X'], w['Y'], w['Width'], w['Height'])
 
@@ -54,7 +62,10 @@ def isVisible(title):
     # TEMP - this is not a real api, I'm just using this name to stoe these notes for now.
     windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListExcludeDesktopElements | Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
     for win in windows:
-        if title in '%s %s' % (win[Quartz.kCGWindowOwnerName], win.get(Quartz.kCGWindowName, '')):
+        if (
+            title
+            in f"{win[Quartz.kCGWindowOwnerName]} {win.get(Quartz.kCGWindowName, '')}"
+        ):
             return win['kCGWindowAlpha'] != 0.0
 
 def isMinimized():
@@ -89,11 +100,11 @@ class MacOSWindow():
         r = self._getWindowRect(_hWnd)
         width = r.right - r.left
         height = r.bottom - r.top
-        return '<%s left="%s", top="%s", width="%s", height="%s", title="%s">' % (self.__class__.__name__, r.left, r.top, width, height, self.title)
+        return f'<{self.__class__.__name__} left="{r.left}", top="{r.top}", width="{width}", height="{height}", title="{self.title}">'
 
 
     def __repr__(self):
-        return '%s(hWnd=%s)' % (self.__class__.__name__, self._hWnd)
+        return f'{self.__class__.__name__}(hWnd={self._hWnd})'
 
 
     def __eq__(self, other):

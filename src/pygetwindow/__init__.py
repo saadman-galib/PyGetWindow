@@ -71,14 +71,7 @@ class BaseWindow:
         r = self._getWindowRect()
         width = r.right - r.left
         height = r.bottom - r.top
-        return '<%s left="%s", top="%s", width="%s", height="%s", title="%s">' % (
-            self.__class__.__qualname__,
-            r.left,
-            r.top,
-            width,
-            height,
-            self.title,
-        )
+        return f'<{self.__class__.__qualname__} left="{r.left}", top="{r.top}", width="{width}", height="{height}", title="{self.title}">'
 
     def close(self):
         """Closes this window. This may trigger "Are you sure you want to
